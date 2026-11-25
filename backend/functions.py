@@ -616,3 +616,119 @@ def submit_race_result(race_id, driver_id, team_id, position, fastest_lap):
 
     return response
 
+
+# E14 - Get Championship Standings
+
+def get_standings(championship_id):
+
+    session = Session(engine)
+
+    championship = session.query(Championships).filter_by(
+        championship_id=championship_id
+    ).first()
+
+    if championship is None:
+        session.close()
+        return False
+
+    results = session.query(RaceResults, Drivers).join(
+        Drivers,
+        RaceResults.driver_id == Drivers.driver_id
+    ).join(
+        Races,
+        RaceResults.race_id == Races.race_id
+    ).filter(
+        Races.championship_id == championship_id
+    ).all()
+
+    standings = {}
+
+    for result, driver in results:
+
+        driver_id = driver.driver_id
+
+        if driver_id not in standings:
+
+            standings[driver_id] = {
+                "driver_id": driver.driver_id,
+                "full_name": driver.full_name,
+                "racing_number": driver.racing_number,
+                "total_points": 0,
+                "wins": 0,
+                "podiums": 0,
+                "races_completed": 0
+            }
+
+        standings[driver_id]["total_points"] += result.points
+        standings[driver_id]["races_completed"] += 1
+
+        if result.position == 1:
+            standings[driver_id]["wins"] += 1
+
+        if result.position <= 3:
+            standings[driver_id]["podiums"] += 1
+
+    response = list(standings.values())
+
+    response.sort(
+        key=lambda x: x["total_points"],
+        reverse=True
+    )
+
+    session.close()
+
+    return response
+
+
+# E15 - Get Driver Performance History
+
+def get_driver_performance(username):
+
+    session = Session(engine)
+
+    user = session.query(User).filter_by(
+        username=username
+    ).first()
+
+    if user is None:
+        session.close()
+        return False
+
+    driver = session.query(Drivers).filter_by(
+        user_id=user.user_id
+    ).first()
+
+    if driver is None:
+        session.close()
+        return False
+
+    results = session.query(RaceResults, Races).join(
+        Races,
+        RaceResults.race_id == Races.race_id
+    ).filter(
+        RaceResults.driver_id == driver.driver_id
+    ).all()
+
+    response = []
+
+    for result, race in results:
+
+        response.append({
+            "race_id": race.race_id,
+            "race_name": race.race_name,
+            "championship_id": race.championship_id,
+            "position": result.position,
+            "points": result.points,
+            "fastest_lap": result.fastest_lap
+        })
+
+    session.close()
+
+    return {
+        "driver_id": driver.driver_id,
+        "full_name": driver.full_name,
+        "racing_number": driver.racing_number,
+        "performance": response
+    }
+
+
