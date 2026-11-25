@@ -1,7 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel
 
 import functions
+
+class TeamApplication(BaseModel):
+
+    team_id: int
 
 
 app = FastAPI()
