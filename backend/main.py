@@ -123,7 +123,7 @@ def refresh_token(data: RefreshRequest):
         raise HTTPException(status_code=401, detail="Invalid or Expired refresh token")
 
     return response
-    
+
 # E8 - Apply to Join Team
 @app.post("/teams/{team_id}/apply")
 def apply_team(team_id: int, token=Header(None)):
@@ -146,5 +146,30 @@ def apply_team(team_id: int, token=Header(None)):
 
     if not response:
         raise HTTPException(status_code=400, detail="Unable to apply for team")
+
+    return response
+
+    # E9 - Accept or Reject Application
+@app.put("/applications/{application_id}")
+def manage_application(
+    application_id: int,
+    data: ApplicationDecision,
+    token=Header(None)
+):
+    payload = authorize(token, ["driver", "admin"])
+
+    user = functions.get_user(username=payload["username"])
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    response = functions.update_application(
+        application_id=application_id,
+        manager_id=user.user_id,
+        decision=data.decision
+    )
+
+    if not response:
+        raise HTTPException(status_code=400, detail="Unable to update application")
 
     return response
