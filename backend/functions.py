@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, Column, create_engine, ForeignKey
+from sqlalchemy import Integer, String, Column, create_engine, ForeignKey , Boolean
 from sqlalchemy.orm import Session, declarative_base
 from datetime import datetime, timedelta, timezone
 import jwt
@@ -53,5 +53,41 @@ class Applications(Base):
     team_id = Column(Integer, ForeignKey("teams.team_id"))
     status = Column(String, default="pending")
     applied_on = Column(String)
+    
+class Championships(Base):
+    __tablename__ = "championships"
+
+    championship_id = Column(Integer, primary_key=True)
+    championship_name = Column(String)
+    organizer_id = Column(Integer, ForeignKey("users.user_id"))
+
+class ChampionshipTeams(Base):
+    __tablename__ = "championship_teams"
+
+    id = Column(Integer, primary_key=True)
+    championship_id = Column(Integer, ForeignKey("championships.championship_id"))
+    team_id = Column(Integer, ForeignKey("teams.team_id"))
+
+class Races(Base):
+    __tablename__ = "races"
+
+    race_id = Column(Integer, primary_key=True)
+    championship_id = Column(Integer, ForeignKey("championships.championship_id"))
+    race_name = Column(String)
+    race_date = Column(String)
+
+class RaceResults(Base):
+    __tablename__ = "race_results"
+
+    result_id = Column(Integer, primary_key=True)
+    race_id = Column(Integer, ForeignKey("races.race_id"))
+    driver_id = Column(Integer, ForeignKey("drivers.driver_id"))
+    team_id = Column(Integer, ForeignKey("teams.team_id"))
+    position = Column(Integer)
+    points = Column(Integer)
+    fastest_lap = Column(Boolean, default=False)
+
 
 Base.metadata.create_all(engine)
+
+
