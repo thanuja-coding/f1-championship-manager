@@ -339,7 +339,9 @@ def get_team(team_id):
         session.close()
         return None
 
-    drivers = session.query(Drivers).filter_by(team_id=team_id).all()
+    drivers = []
+    for application in session.query(Applications).filter_by(team_id=team_id, status="accepted").all():
+        drivers.append(session.get(Drivers, application.driver_id))
     response = {
         "team_id": team.team_id,
         "team_name": team.team_name,
@@ -363,6 +365,12 @@ def register_team_for_championship(championship_id, team_id):
     session.commit()
     session.close()
     return {"message": "Team registered for championship successfully"}
+
+def get_user(username):
+    session = Session(engine)
+    user = session.query(User).filter_by(username=username).first()
+    session.close()
+    return user
 
 def get_championship(championship_id):
     session = Session(engine)
