@@ -197,3 +197,38 @@ def add_race_result(
 
     return response
 
+# E14 - Get Championship Standings
+@app.get("/championships/{championship_id}/standings")
+def championship_standings(championship_id: int):
+    response = functions.get_standings(
+        championship_id=championship_id
+    )
+
+    if response is False:
+        raise HTTPException(status_code=404, detail="Championship not found")
+
+    return response
+
+# E14 - Get Championship Standings
+@app.get("/championships/{championship_id}/standings")
+def championship_standings(championship_id: int):
+    response = functions.get_standings(
+        championship_id=championship_id
+    )
+
+    if response is False:
+        raise HTTPException(status_code=404, detail="Championship not found")
+
+    return response
+    
+# E15 - Get Driver Performance
+@app.get("/drivers/{username}/performance")
+def driver_performance(username: str):
+    response = functions.get_driver_performance(
+        username=username
+    )
+
+    if response is False:
+        raise HTTPException(status_code=404, detail="Driver not found")
+
+    return response
