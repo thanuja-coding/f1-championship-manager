@@ -457,3 +457,162 @@ def apply_to_team(driver_id, team_id):
 
     return response
 
+
+# E9 - Accept or Reject Application
+
+def update_application(application_id, manager_id, decision):
+
+    session = Session(engine)
+
+    application = session.query(Applications).filter_by(
+        application_id=application_id
+    ).first()
+
+    if application is None:
+        session.close()
+        return False
+
+    team = session.query(Teams).filter_by(
+        team_id=application.team_id
+    ).first()
+
+    if team is None or team.manager_id != manager_id:
+        session.close()
+        return False
+
+    if application.status != "pending":
+        session.close()
+        return False
+
+    if decision not in ["accepted", "rejected"]:
+        session.close()
+        return False
+
+    if decision == "accepted":
+
+        driver = session.query(Drivers).filter_by(
+            driver_id=application.driver_id
+        ).first()
+
+        if driver is None or driver.team_id is not None:
+            session.close()
+            return False
+
+        current_drivers = session.query(Drivers).filter_by(
+            team_id=team.team_id
+        ).count()
+
+        if current_drivers >= team.driver_limit:
+            session.close()
+            return False
+
+        driver.team_id = team.team_id
+
+    application.status = decision
+
+    session.commit()
+
+    response = {
+        "application_id": application.application_id,
+        "driver_id": application.driver_id,
+        "team_id": application.team_id,
+        "status": application.status
+    }
+
+    session.close()
+
+    return response
+
+
+# E13 - Submit Race Results
+
+def submit_race_result(race_id, driver_id, team_id, position, fastest_lap):
+
+    session = Session(engine)
+
+    race = session.query(Races).filter_by(
+        race_id=race_id
+    ).first()
+
+    driver = session.query(Drivers).filter_by(
+        driver_id=driver_id
+    ).first()
+
+    team = session.query(Teams).filter_by(
+        team_id=team_id
+    ).first()
+
+    if race is None or driver is None or team is None:
+        session.close()
+        return False
+
+    if driver.team_id != team_id:
+        session.close()
+        return False
+
+    registered_team = session.query(ChampionshipTeams).filter_by(
+        championship_id=race.championship_id,
+        team_id=team_id
+    ).first()
+
+    if registered_team is None:
+        session.close()
+        return False
+
+    existing_result = session.query(RaceResults).filter_by(
+        race_id=race_id,
+        driver_id=driver_id
+    ).first()
+
+    if existing_result is not None:
+        session.close()
+        return False
+
+    if position < 1:
+        session.close()
+        return False
+
+    points_table = {
+        1: 25,
+        2: 18,
+        3: 15,
+        4: 12,
+        5: 10,
+        6: 8,
+        7: 6,
+        8: 4,
+        9: 2,
+        10: 1
+    }
+
+    points = points_table.get(position, 0)
+
+    if fastest_lap and position <= 10:
+        points = points + 1
+
+    new_result = RaceResults(
+        race_id=race_id,
+        driver_id=driver_id,
+        team_id=team_id,
+        position=position,
+        points=points,
+        fastest_lap=fastest_lap
+    )
+
+    session.add(new_result)
+    session.commit()
+
+    response = {
+        "result_id": new_result.result_id,
+        "race_id": new_result.race_id,
+        "driver_id": new_result.driver_id,
+        "team_id": new_result.team_id,
+        "position": new_result.position,
+        "points": new_result.points,
+        "fastest_lap": new_result.fastest_lap
+    }
+
+    session.close()
+
+    return response
+
