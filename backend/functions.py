@@ -371,4 +371,25 @@ def get_championship(championship_id):
     return championship
 
 
+# A3 - Refresh Access Token
 
+def refresh_access_token(refresh_token):
+
+    payload = verify_token(refresh_token, "refresh")
+
+    if not payload:
+        return False
+
+    username = payload["username"]
+    role = payload["role"]
+
+    access_token = create_token(
+        username=username,
+        token_type="access",
+        role=role
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
