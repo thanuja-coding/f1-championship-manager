@@ -38,7 +38,7 @@ class Teams(Base):
 
 class Drivers(Base):
     __tablename__ = "drivers"
-
+ 
     driver_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.user_id"))
     full_name = Column(String)
@@ -89,5 +89,107 @@ class RaceResults(Base):
 
 
 Base.metadata.create_all(engine)
+
+
+#A1 
+def register_user(username: str, password: str, role: str):
+    session = Session(engine)
+    user_exists = session.query(User).filter_by(username = username).first()
+    if user_exists is not None:
+        session.close()
+        return False
+
+    try:
+        hashed_password = ph.hash(password)
+    except Exception:
+        session.close()
+        return False
+
+    session.add(User(username=username, password=hashed_password, role=role))
+    session.commit()
+    session.close()
+    return True
+
+
+#admin
+def create_admin():
+    session = Session(engine)
+    admin = session.query(User).filter_by(role="admin").first()
+    if admin is None:
+        session.add(User(username="admin", password=ph.hash("admin123"), role="admin"))
+        session.commit()
+    session.close()
+
+
+#E2
+def create_team(team_name, country, manager_id, driver_limit):
+    session = Session(engine)
+    manager = session.get(User, manager_id)
+    team_exists = session.query(Teams).filter_by(team_name=team_name).first()
+    if manager is None or team_exists is not None:
+        session.close()
+        return False
+
+    new_team = Teams(team_name=team_name, country=country, manager_id=manager_id, driver_limit=driver_limit)
+    session.add(new_team)
+    session.commit()
+    response = {
+        "team_id": new_team.team_id,
+        "team_name": new_team.team_name,
+        "country": new_team.country,
+        "manager_id": new_team.manager_id,
+        "driver_limit": new_team.driver_limit
+    }
+    session.close()
+    return response
+
+#E3
+def get_all_teams():
+    session = Session(engine)
+    response = []
+    for team in session.query(Teams).all():
+        response.append(team)
+    session.close()
+    return response
+
+#E4
+def get_team(team_id):
+    session = Session(engine)
+    team = session.get(Teams, team_id)
+    if team is None:
+        session.close()
+        return None
+
+    drivers = session.query(Drivers).filter_by(team_id=team_id).all()
+    response = {
+        "team_id": team.team_id,
+        "team_name": team.team_name,
+        "country": team.country,
+        "manager_id": team.manager_id,
+        "driver_limit": team.driver_limit,
+        "drivers": drivers
+    }
+    session.close()
+    return response
+
+#E10
+def register_team_for_championship(championship_id, team_id):
+    session = Session(engine)
+    already = session.query(ChampionshipTeams).filter_by(championship_id=championship_id, team_id=team_id).first()
+    if already is not None:
+        session.close()
+        return False
+
+    session.add(ChampionshipTeams(championship_id=championship_id, team_id=team_id))
+    session.commit()
+    session.close()
+    return {"message": "Team registered for championship successfully"}
+
+def get_championship(championship_id):
+    session = Session(engine)
+    championship = session.get(Championships, championship_id)
+    session.close()
+    return championship
+
 
 
