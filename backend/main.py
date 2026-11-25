@@ -173,3 +173,27 @@ def manage_application(
         raise HTTPException(status_code=400, detail="Unable to update application")
 
     return response
+
+
+# E13 - Submit Race Results
+@app.post("/races/{race_id}/results")
+def add_race_result(
+    race_id: int,
+    data: RaceResultRequest,
+    token=Header(None)
+):
+    authorize(token, ["organizer"])
+
+    response = functions.submit_race_result(
+        race_id=race_id,
+        driver_id=data.driver_id,
+        team_id=data.team_id,
+        position=data.position,
+        fastest_lap=data.fastest_lap
+    )
+
+    if not response:
+        raise HTTPException(status_code=400, detail="Unable to submit race result")
+
+    return response
+
