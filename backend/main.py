@@ -14,6 +14,7 @@ ROLES = ["admin", "driver"]
 
 
 
+
 def authorize(token, allowed_roles):
     payload = functions.verify_token(token=token, token_type="access")
     if not payload:
@@ -22,6 +23,19 @@ def authorize(token, allowed_roles):
         raise HTTPException(status_code=403, detail="You do not have permission to do this")
     return payload
 
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+
+class ApplicationDecision(BaseModel):
+    decision: str
+
+
+class RaceResultRequest(BaseModel):
+    driver_id: int = Field(gt=0)
+    team_id: int = Field(gt=0)
+    position: int = Field(gt=0)
+    fastest_lap: bool = False
 
 class UserCreate(BaseModel):
     username: str = Field(min_length=2)
