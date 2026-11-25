@@ -111,3 +111,40 @@ def register_team(championship_id:int , data: ChampionshipTeamCreate , token = H
     if not response:
         raise HTTPException(status_code=409,detail="Team already registered for this championship")
     return response
+
+    # A3 - Refresh Access Token
+@app.post("/auth/refresh")
+def refresh_token(data: RefreshRequest):
+    response = functions.refresh_access_token(
+        refresh_token=data.refresh_token
+    )
+
+    if not response:
+        raise HTTPException(status_code=401, detail="Invalid or Expired refresh token")
+
+    return response
+    
+# E8 - Apply to Join Team
+@app.post("/teams/{team_id}/apply")
+def apply_team(team_id: int, token=Header(None)):
+    payload = authorize(token, ["driver"])
+
+    user = functions.get_user(username=payload["username"])
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    driver = functions.get_driver_by_user_id(user_id=user.user_id)
+
+    if driver is None:
+        raise HTTPException(status_code=404, detail="Driver profile not found")
+
+    response = functions.apply_to_team(
+        driver_id=driver.driver_id,
+        team_id=team_id
+    )
+
+    if not response:
+        raise HTTPException(status_code=400, detail="Unable to apply for team")
+
+    return response
