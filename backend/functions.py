@@ -393,3 +393,67 @@ def refresh_access_token(refresh_token):
         "access_token": access_token,
         "token_type": "bearer"
     }
+
+
+# E8 - Apply to Join Team
+
+def apply_to_team(driver_id, team_id):
+
+    session = Session(engine)
+
+    driver = session.query(Drivers).filter_by(
+        driver_id=driver_id
+    ).first()
+
+    team = session.query(Teams).filter_by(
+        team_id=team_id
+    ).first()
+
+    if driver is None or team is None:
+        session.close()
+        return False
+
+    if driver.team_id is not None:
+        session.close()
+        return False
+
+    current_drivers = session.query(Drivers).filter_by(
+        team_id=team_id
+    ).count()
+
+    if current_drivers >= team.driver_limit:
+        session.close()
+        return False
+
+    existing_application = session.query(Applications).filter_by(
+        driver_id=driver_id,
+        team_id=team_id,
+        status="pending"
+    ).first()
+
+    if existing_application is not None:
+        session.close()
+        return False
+
+    new_application = Applications(
+        driver_id=driver_id,
+        team_id=team_id,
+        status="pending",
+        applied_on=str(datetime.now(timezone.utc))
+    )
+
+    session.add(new_application)
+    session.commit()
+
+    response = {
+        "application_id": new_application.application_id,
+        "driver_id": new_application.driver_id,
+        "team_id": new_application.team_id,
+        "status": new_application.status,
+        "applied_on": new_application.applied_on
+    }
+
+    session.close()
+
+    return response
+
