@@ -40,6 +40,7 @@ class Drivers(Base):
  
     driver_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.user_id"))
+    team_id = Column(Integer, ForeignKey("teams.team_id")) 
     full_name = Column(String)
     nationality = Column(String)
     racing_number = Column(Integer, unique=True)
@@ -289,15 +290,6 @@ def register_user(username: str, password: str, role: str):
     session.close()
     return True
 
-
-#admin
-def create_admin():
-    session = Session(engine)
-    admin = session.query(User).filter_by(role="admin").first()
-    if admin is None:
-        session.add(User(username="admin", password=ph.hash("admin123"), role="admin"))
-        session.commit()
-    session.close()
 
 
 #E2
@@ -595,8 +587,6 @@ def submit_race_result(race_id, driver_id, team_id, position, fastest_lap):
 
     points = points_table.get(position, 0)
 
-    if fastest_lap and position <= 10:
-        points = points + 1
 
     new_result = RaceResults(
         race_id=race_id,
