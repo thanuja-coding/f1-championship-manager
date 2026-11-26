@@ -44,7 +44,5 @@ jobs:
             sudo usermod -aG docker $USER
             sudo docker pull ${{ env.IMAGE }}:${{ env.VERSION }}
             sudo docker rm -f f1-app || true
-            touch /home/ubuntu/f1_championship.db
-            sudo docker run -d --name f1-app --restart unless-stopped -p 8001:8001 -e SECRET_KEY="${{ secrets.SECRET_KEY }}" -v /home/ubuntu/f1_championship.db:/app/f1_championship.db ${{ env.IMAGE }}:${{ env.VERSION }}
-            sudo docker image prune -af
-            sudo docker ps --filter name=f1-app
+            touch /home/ec2-user/f1_championship.db
+            sudo docker run -d --name f1-app --restart unless-stopped -p 8001:8001 -e SECRET_KEY="${{ secrets.SECRET_KEY
