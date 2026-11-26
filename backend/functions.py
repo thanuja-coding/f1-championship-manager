@@ -720,4 +720,17 @@ def get_driver_performance(username):
         "performance": response
     }
 
+    # Get Driver by User ID
+def get_driver_by_user_id(user_id):
+
+    session = Session(engine)
+
+    driver = session.query(Drivers).filter_by(
+        user_id=user_id
+    ).first()
+
+    session.close()
+
+    return driver
+
 

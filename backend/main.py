@@ -14,6 +14,7 @@ ROLES = ["admin", "driver"]
 
 
 
+
 def authorize(token, allowed_roles):
     payload = functions.verify_token(token=token, token_type="access")
     if not payload:
@@ -22,6 +23,19 @@ def authorize(token, allowed_roles):
         raise HTTPException(status_code=403, detail="You do not have permission to do this")
     return payload
 
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+
+class ApplicationDecision(BaseModel):
+    decision: str
+
+
+class RaceResultRequest(BaseModel):
+    driver_id: int = Field(gt=0)
+    team_id: int = Field(gt=0)
+    position: int = Field(gt=0)
+    fastest_lap: bool = False
 
 class UserCreate(BaseModel):
     username: str = Field(min_length=2)
@@ -96,4 +110,125 @@ def register_team(championship_id:int , data: ChampionshipTeamCreate , token = H
     response = functions.register_team_for_championship(championship_id=championship_id , team_id=data.team_id)
     if not response:
         raise HTTPException(status_code=409,detail="Team already registered for this championship")
+    return response
+
+    # A3 - Refresh Access Token
+@app.post("/auth/refresh")
+def refresh_token(data: RefreshRequest):
+    response = functions.refresh_access_token(
+        refresh_token=data.refresh_token
+    )
+
+    if not response:
+        raise HTTPException(status_code=401, detail="Invalid or Expired refresh token")
+
+    return response
+
+# E8 - Apply to Join Team
+@app.post("/teams/{team_id}/apply")
+def apply_team(team_id: int, token=Header(None)):
+    payload = authorize(token, ["driver"])
+
+    user = functions.get_user(username=payload["username"])
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    driver = functions.get_driver_by_user_id(user_id=user.user_id)
+
+    if driver is None:
+        raise HTTPException(status_code=404, detail="Driver profile not found")
+
+    response = functions.apply_to_team(
+        driver_id=driver.driver_id,
+        team_id=team_id
+    )
+
+    if not response:
+        raise HTTPException(status_code=400, detail="Unable to apply for team")
+
+    return response
+
+    # E9 - Accept or Reject Application
+@app.put("/applications/{application_id}")
+def manage_application(
+    application_id: int,
+    data: ApplicationDecision,
+    token=Header(None)
+):
+    payload = authorize(token, ["driver", "admin"])
+
+    user = functions.get_user(username=payload["username"])
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    response = functions.update_application(
+        application_id=application_id,
+        manager_id=user.user_id,
+        decision=data.decision
+    )
+
+    if not response:
+        raise HTTPException(status_code=400, detail="Unable to update application")
+
+    return response
+
+
+# E13 - Submit Race Results
+@app.post("/races/{race_id}/results")
+def add_race_result(
+    race_id: int,
+    data: RaceResultRequest,
+    token=Header(None)
+):
+    authorize(token, ["organizer"])
+
+    response = functions.submit_race_result(
+        race_id=race_id,
+        driver_id=data.driver_id,
+        team_id=data.team_id,
+        position=data.position,
+        fastest_lap=data.fastest_lap
+    )
+
+    if not response:
+        raise HTTPException(status_code=400, detail="Unable to submit race result")
+
+    return response
+
+# E14 - Get Championship Standings
+@app.get("/championships/{championship_id}/standings")
+def championship_standings(championship_id: int):
+    response = functions.get_standings(
+        championship_id=championship_id
+    )
+
+    if response is False:
+        raise HTTPException(status_code=404, detail="Championship not found")
+
+    return response
+
+# E14 - Get Championship Standings
+@app.get("/championships/{championship_id}/standings")
+def championship_standings(championship_id: int):
+    response = functions.get_standings(
+        championship_id=championship_id
+    )
+
+    if response is False:
+        raise HTTPException(status_code=404, detail="Championship not found")
+
+    return response
+    
+# E15 - Get Driver Performance
+@app.get("/drivers/{username}/performance")
+def driver_performance(username: str):
+    response = functions.get_driver_performance(
+        username=username
+    )
+
+    if response is False:
+        raise HTTPException(status_code=404, detail="Driver not found")
+
     return response
