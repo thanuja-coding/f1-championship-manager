@@ -1,0 +1,418 @@
+
+/* Main Layout */
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-main);
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  padding: 30px;
+  margin-left: 250px;
+}
+
+/* Sidebar */
+
+.sidebar {
+  width: 250px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  padding: 30px 20px;
+  position: fixed;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.sidebar-logo h2 {
+  font-size: 23px;
+  color: white;
+}
+
+.sidebar-logo h2 span {
+  color: var(--primary);
+}
+
+.sidebar-logo p {
+  color: var(--text-secondary);
+  font-size: 10px;
+  letter-spacing: 2px;
+  margin-top: 7px;
+}
+
+.menu-title {
+  color: #777;
+  font-size: 11px;
+  margin-top: 50px;
+  margin-bottom: 15px;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-link {
+  padding: 13px 15px;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background: #321b1b;
+  color: white;
+  border-left: 3px solid var(--primary);
+}
+
+.logout-button {
+  margin-top: auto;
+  padding: 12px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: white;
+  border-radius: 6px;
+}
+
+.logout-button:hover {
+  background: var(--primary);
+}
+
+/* Navbar */
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 25px;
+  margin-bottom: 35px;
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar-label {
+  color: var(--primary);
+  font-size: 10px;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.navbar h3 {
+  font-size: 20px;
+}
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-user p {
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin-top: 4px;
+  text-transform: capitalize;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+}
+
+/* Page Header */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+}
+
+.page-header p {
+  color: var(--text-secondary);
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+/* Dashboard Cards */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 25px;
+}
+
+.stat-card,
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px;
+}
+
+.stat-card {
+  border-top: 3px solid var(--primary);
+}
+
+.stat-card p {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.stat-card h2 {
+  font-size: 29px;
+  margin: 15px 0;
+}
+
+.stat-card span {
+  color: #888;
+  font-size: 12px;
+}
+
+.card h2 {
+  font-size: 19px;
+  margin-bottom: 18px;
+}
+
+.card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Buttons */
+
+.primary-button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.primary-button:hover {
+  background: var(--primary-hover);
+}
+
+/* Forms */
+
+.form-card {
+  margin-bottom: 25px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid var(--border);
+  background: #111;
+  color: white;
+  border-radius: 6px;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--primary);
+}
+
+input::placeholder {
+  color: #777;
+}
+
+/* Tables */
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 15px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+th {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+td {
+  color: #ddd;
+}
+
+/* Team Cards */
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.team-card h2 {
+  color: white;
+}
+
+.team-card p {
+  margin-bottom: 8px;
+}
+
+.team-card button {
+  margin-top: 15px;
+}
+
+/* Authentication */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: #111;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-card);
+  padding: 40px;
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--primary);
+  border-radius: 12px;
+}
+
+.auth-card h1 {
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+.auth-card h1 span {
+  color: var(--primary);
+}
+
+.auth-card > p {
+  color: var(--text-secondary);
+  margin-bottom: 25px;
+}
+
+.auth-card form {
+  margin-bottom: 20px;
+}
+
+.auth-card > p:last-child {
+  text-align: center;
+  font-size: 13px;
+  margin-top: 20px;
+}
+
+.auth-card a {
+  color: var(--primary);
+}
+
+.error-message {
+  color: #ff5555 !important;
+  margin-top: 15px;
+}
+
+.success-message {
+  color: #4ade80 !important;
+  margin-top: 15px;
+}
+
+/* Other */
+
+.loading {
+  text-align: center;
+  padding: 50px;
+  color: var(--text-secondary);
+}
+
+.performance-data {
+  color: white;
+  white-space: pre-wrap;
+  margin-top: 20px;
+}
+
+/* Responsive */
+
+@media (max-width: 1100px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 750px) {
+  .sidebar {
+    width: 190px;
+  }
+
+  .main-content {
+    margin-left: 190px;
+    padding: 20px;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 550px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .main-content {
+    margin-left: 0;
+    padding: 18px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .navbar {
+    align-items: flex-start;
+    gap: 15px;
+  }
+}
