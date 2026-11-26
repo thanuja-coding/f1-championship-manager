@@ -13,7 +13,6 @@ ROLES = ["admin", "driver"]
 
 
 
-
 def authorize(token, allowed_roles):
     payload = functions.verify_token(token=token, token_type="access")
     if not payload:
