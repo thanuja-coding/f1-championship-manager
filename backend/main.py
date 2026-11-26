@@ -2,11 +2,21 @@ from fastapi import FastAPI , HTTPException , Header
 from pydantic import BaseModel , Field
 from datetime import date
 import functions
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title = "F1 Championship Manager API",
     description="Manage racing teams, drivers, championships, races, results and standings",
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 ROLES = ["admin", "driver"]
 
 def authorize(token, allowed_roles):

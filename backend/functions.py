@@ -131,11 +131,17 @@ def verify_login(username, password):
         session.close()
         return False
 
-    access_token = create_token(username=username, token_type="access", role=user.role)
-    refresh_token = create_token(username=username, token_type="refresh", role=user.role)
+    role = user.role
+    access_token = create_token(username=username, token_type="access", role=role)
+    refresh_token = create_token(username=username, token_type="refresh", role=role)
 
     session.close()
-    return {"access_token": access_token, "refresh_token": refresh_token}
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "username": username,
+        "role": role,
+    }
 
 # E5 - Create Championship
 def add_championship(championship_name, organizer_id):
@@ -733,5 +739,3 @@ def get_driver_by_user_id(user_id):
     session.close()
 
     return driver
-
-
