@@ -1,6 +1,12 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { apiRequest, saveTokens } from "../services/api";
+
+const DASHBOARD_BY_ROLE = {
+  admin: "/admin",
+  organizer: "/organizer",
+  driver: "/driver",
+};
 
 function Login() {
   const navigate = useNavigate();
@@ -8,10 +14,34 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
-    setError("Login API is not yet available in the backend.");
+    setError("");
+    setLoading(true);
+
+    try {
+      const data = await apiRequest("/auth/login", "POST", {
+        username: username,
+        password: password,
+      });
+
+      const dashboard = DASHBOARD_BY_ROLE[data.role];
+      if (!dashboard) {
+        throw new Error(`Unknown account role: ${data.role}`);
+      }
+
+      saveTokens(data.access_token, data.refresh_token);
+      localStorage.setItem("username", data.username);
+      localStorage.setItem("role", data.role);
+
+      navigate(dashboard);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -37,8 +67,8 @@ function Login() {
             required
           />
 
-          <button className="primary-button">
-            Login
+          <button className="primary-button" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
