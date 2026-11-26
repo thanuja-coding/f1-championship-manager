@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Docker Hub image name in the form <dockerhub-username>/<repo-name>, e.g. gthanuja/f1-championship.
-      # The username comes from the DOCKERHUB_USERNAME secret.
+      # The username comes from the DOCKERHUB_USERNAME secret; change "f1-championship" to your own repo name.
       IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/f1-championship
       VERSION: v${{ github.run_number }}
     steps:
@@ -44,7 +44,7 @@ jobs:
             sudo usermod -aG docker $USER
             sudo docker pull ${{ env.IMAGE }}:${{ env.VERSION }}
             sudo docker rm -f f1-app || true
-            touch /home/ubuntu/f1_championship.db
-            sudo docker run -d --name f1-app --restart unless-stopped -p 8001:8001 -e SECRET_KEY="${{ secrets.SECRET_KEY }}" -v /home/ubuntu/f1_championship.db:/app/f1_championship.db ${{ env.IMAGE }}:${{ env.VERSION }}
+            touch /home/ec2-user/f1_championship.db
+            sudo docker run -d --name f1-app --restart unless-stopped -p 8001:8001 -e SECRET_KEY="${{ secrets.SECRET_KEY }}" -v /home/ec2-user/f1_championship.db:/app/f1_championship.db ${{ env.IMAGE }}:${{ env.VERSION }}
             sudo docker image prune -af
             sudo docker ps --filter name=f1-app
