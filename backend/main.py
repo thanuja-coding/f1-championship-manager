@@ -56,6 +56,29 @@ class TeamCreate(BaseModel):
 class ChampionshipTeamCreate(BaseModel):
     team_id: int = Field(gt=0)
 
+# A2
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+# E5
+class ChampionshipCreate(BaseModel):
+    championship_name: str = Field(min_length=2)
+
+
+# E7
+class DriverCreate(BaseModel):
+    full_name: str = Field(min_length=2)
+    nationality: str = Field(min_length=2)
+    racing_number: int = Field(gt=0)
+
+
+# E11
+class RaceCreate(BaseModel):
+    race_name: str = Field(min_length=2)
+    race_date: date
+
 
 #A1
 @app.post("/auth/register")
@@ -232,4 +255,79 @@ def driver_performance(username: str):
     return response
 
 
+# A2 - Login
+@app.post("/auth/login")
+def login(data: LoginRequest):
+    response = functions.verify_login(
+        username=data.username,
+        password=data.password
+    )
 
+    if not response:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+
+    return response
+
+
+# E5 - Create Championship
+@app.post("/championships")
+def create_championship(championship: ChampionshipCreate, token=Header(None)):
+    payload = authorize(token, ["organizer"])
+
+    user = functions.get_user(username=payload["username"])
+
+    response = functions.add_championship(championship_name=championship.championship_name,organizer_id=user.user_id)
+    return response
+
+
+# E6 - Get All Championships
+@app.get("/championships")
+def championships():
+    return functions.get_all_championships()
+
+
+# E7 - Register Driver Profile
+@app.post("/drivers")
+def register_driver(data: DriverCreate, token=Header(None)):
+    payload = authorize(token, ["driver"])
+
+    user = functions.get_user(username=payload["username"])
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    response = functions.register_driver(
+        user_id=user.user_id,
+        full_name=data.full_name,
+        nationality=data.nationality,
+        racing_number=data.racing_number
+    )
+
+    if not response:
+        raise HTTPException(status_code=409,detail="Driver profile already exists or racing number is taken")
+    return response
+
+
+# E11 - Schedule Race
+@app.post("/championships/{championship_id}/races")
+def schedule_race(championship_id: int, data: RaceCreate, token=Header(None)):
+    authorize(token, ["organizer"])
+
+    response = functions.add_race(
+        championship_id=championship_id,
+        race_name=data.race_name,
+        race_date=str(data.race_date)
+    )
+
+    if not response:
+        raise HTTPException(status_code=404, detail="Championship not found")
+    return response
+
+
+# E12 - Get Races for Championship
+@app.get("/championships/{championship_id}/races")
+def championship_races(championship_id: int):
+    if functions.get_championship(championship_id=championship_id) is None:
+        raise HTTPException(status_code=404, detail="Championship not found")
+
+    return functions.get_races(championship_id=championship_id)

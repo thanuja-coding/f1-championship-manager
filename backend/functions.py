@@ -103,12 +103,7 @@ def create_token(username, token_type, role):
         "exp": datetime.now(timezone.utc) + timedelta(minutes=time)
     }
 
-    token = jwt.encode(
-        payload=payload,
-        key=SECRET_KEY,
-        algorithm=ALGORITHM
-    )
-
+    token = jwt.encode(payload=payload,key=SECRET_KEY,algorithm=ALGORITHM)
     return token
 
 def verify_token(token, token_type):
@@ -119,15 +114,12 @@ def verify_token(token, token_type):
 
     if payload["token_type"] == token_type:
         return payload
-
     return False
 
 # A2 - Login
 def verify_login(username, password):
     session = Session(engine)
-
     user = session.query(User).filter_by(username=username).first()
-
     if user is None:
         session.close()
         return False
@@ -142,7 +134,6 @@ def verify_login(username, password):
     refresh_token = create_token(username=username, token_type="refresh", role=user.role)
 
     session.close()
-
     return {"access_token": access_token, "refresh_token": refresh_token}
 
 # E5 - Create Championship
