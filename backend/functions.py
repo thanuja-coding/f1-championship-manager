@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+import os
 
 
 ph = PasswordHasher()
@@ -14,7 +15,7 @@ Base = declarative_base()
 
 ACCESS_TOKEN_EXPIRY = 15
 REFRESH_TOKEN_EXPIRY = 7*24*60
-SECRET_KEY = "SECRETCODE"
+SECRET_KEY = os.getenv("SECRET_KEY", "SECRETCODE")
 ALGORITHM = "HS256"
 
 class User(Base):
