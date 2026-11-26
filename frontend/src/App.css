@@ -82,3 +82,61 @@
     flex-direction: column;
   }
 }
+
+.home-page {
+  min-height: 100vh;
+  padding: 70px 40px;
+  text-align: center;
+}
+
+.home-page h1 {
+  font-size: 38px;
+  letter-spacing: 2px;
+  color: var(--text-main);
+}
+
+.home-page > p {
+  color: var(--text-secondary);
+  margin-top: 15px;
+}
+
+.role-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  max-width: 1000px;
+  margin: 60px auto;
+}
+
+.role-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--primary);
+  border-radius: 10px;
+  padding: 40px 20px;
+  transition: 0.2s;
+}
+
+.role-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary);
+}
+
+.role-card h2 {
+  margin-bottom: 15px;
+}
+
+.role-card p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+@media (max-width: 700px) {
+  .role-container {
+    grid-template-columns: 1fr;
+  }
+
+  .home-page h1 {
+    font-size: 27px;
+  }
+}
