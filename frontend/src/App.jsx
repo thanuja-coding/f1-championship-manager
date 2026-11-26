@@ -1,53 +1,41 @@
+=
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import OrganizerDashboard from "./pages/organizer/OrganizerDashboard";
+import DriverDashboard from "./pages/driver/DriverDashboard";
+
+import Teams from "./pages/Teams";
+import Championships from "./pages/Championships";
+import Standings from "./pages/Standings";
+import Races from "./pages/Races";
+import Profile from "./pages/Profile";
+
 import "./App.css";
-
-function Home() {
-  return (
-    <div className="home-page">
-      <h1>F1 CHAMPIONSHIP MANAGER</h1>
-      <p>Select a dashboard to continue</p>
-
-      <div className="role-container">
-        <Link to="/admin" className="role-card">
-          <h2>Admin</h2>
-          <p>Manage teams and organizers</p>
-        </Link>
-
-        <Link to="/organizer" className="role-card">
-          <h2>Organizer</h2>
-          <p>Manage championships and races</p>
-        </Link>
-
-        <Link to="/driver" className="role-card">
-          <h2>Driver</h2>
-          <p>View teams and performance</p>
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-function AdminDashboard() {
-  return <h1>Admin Dashboard</h1>;
-}
-
-function OrganizerDashboard() {
-  return <h1>Organizer Dashboard</h1>;
-}
-
-function DriverDashboard() {
-  return <h1>Driver Dashboard</h1>;
-}
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Navigate to="/login" />} />
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/organizer" element={<OrganizerDashboard />} />
         <Route path="/driver" element={<DriverDashboard />} />
+
+        <Route path="/teams" element={<Teams />} />
+        <Route path="/championships" element={<Championships />} />
+        <Route path="/standings" element={<Standings />} />
+        <Route path="/races" element={<Races />} />
+        <Route path="/profile" element={<Profile />} />
+
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   );
